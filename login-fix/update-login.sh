@@ -31,9 +31,10 @@ curl -X PUT -f \
   -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
   -F "sso_settings[auth_discovery_url=$login_url"
 
-if [ $? -ne 0 ]; then
-  if [ $? -eq 22 ]; then
-    echo "Login failed for: $host check token is valid"
+code=$?
+if [ $code -ne 0 ]; then
+  if [ $code -eq 22 ]; then
+    echo "Login failed for: $host check token is invalid"
   else
     echo "Failed to update login page for: $host"
   fi

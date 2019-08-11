@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# Re-queue a job at at(1) if it doesn't exit successfully.
+
+usage() { echo "Usage: $0 -e <command> [-r <retries>] [-i <interval>] [-p <day|hour|minute>]" 1>&2; exit 1; }
+error() { echo "Error: $1" 1>&2; }
+
+retires=1
+interval=1
+period=day
+
+while getopts ":e:r:i:p:" o; do
+    case "${o}" in
+        e)
+            command=${OPTARG}
+            ;;
+        r)
+            retries=${OPTARG}
+	    ((retries >= 0)) || (error "retries must be zero or more" && usage)
+            ;;
+        i)
+            interval=${OPTARG}
+	    ((interval > 0)) || (error "internal must be more than zero" && usage)
+            ;;
+        p)
+            period=${OPTARG}
+	    [ "$period" == "day" -o "$period" == "hour" -o "$period" == "minute" ] || \
+	      (error "period must be one of day|hour|minute" && usage)
+            ;;
+        *)
+	    error "Unrecognised argument option: -${OPTARG}"
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${command}" ]; then
+    usage
+fi
+
+# Run the command let the output be set to calling program
+"${command}"
+
+if [ $? -ne 0 ]; then
+
+  echo "${command} failed"
+
+  let "retries--"
+  if [ $retries -ge 0 ]; then
+    echo "Requeuing job, $retries retries"
+    echo "$0 -e '${command}' -r ${retries} -i ${interval} -p ${period}" | at now + ${interval} ${period}
+  else 
+    echo "No more retries"
+  fi
+
+fi
+
+
+
+
+

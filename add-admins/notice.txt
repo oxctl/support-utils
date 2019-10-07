@@ -1,0 +1,2 @@
+The automatic job to add additional administrator that runs after the environments are refreshed has failed to run successfully the error is:
+

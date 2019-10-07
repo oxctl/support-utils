@@ -38,8 +38,10 @@ do
   code=$?
   if [ $code -ne 0 ]; then
     if [ $code -eq 22 ]; then
-      echo "Login failed for: $host check token is invalid"
+      cat notice.txt
+      echo "Login failed for: ${host}\nCheck token is valid"
     else
+      cat notice.txt
       echo "Failed to add: $admin for: $host"
     fi
     exit 1

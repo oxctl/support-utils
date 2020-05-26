@@ -24,7 +24,7 @@ shift $((OPTIND-1))
 [ -z "$host" ] && usage
 
 # Course ID is in the first column and skip the header.
-csvcut -c canvas_course_id | tail -1| while read id; do
+csvcut -c canvas_course_id | tail +2| while read id; do
     echo -n "$id,"
     ccurl -s https://${host}/api/v1/courses/${id}?include[]=indexed | jq '.indexed'
     if [ -n "$setting" ]; then

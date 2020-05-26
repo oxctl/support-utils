@@ -8,5 +8,5 @@ Run a provisioning report on the courses for the account/term and then download 
 
     cat courses.csv | /.manage-course-index.sh -h universityofoxford.test.instructure.com -s true
 
-It will always output a spreadsheet containing the previous values of all the courses.
+It will always output a spreadsheet containing the previous values of all the courses (this is before any changes were made).
 

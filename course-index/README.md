@@ -1,4 +1,4 @@
-# Manage the course index settins
+# Manage the course index settings
 
 These scripts are for managing the course index settings on a large number of courses
 

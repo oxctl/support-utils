@@ -22,6 +22,9 @@ if [ -z "${host}" ] || [ -z "${token}" ] || [ -z "${admins}" ]; then
   exit 1
 fi
 
+# Check that the host is up
+../check-up/check-up "https://${host}/health_check" || (echo "Not running, host isn't up"; exit 1)
+
 # Space sepatated list of user IDs
 read -r -a admin_array <<< "${admins}"
 

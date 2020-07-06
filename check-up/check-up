@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Just checks that Canvas is up.
+
+if [ "$1" == "" ]; then
+  echo Usage: $(basename $0) url
+  exit 1;
+fi
+
+url="$1"
+
+temp=$(mktemp)
+trap "{ rm -f $temp; }" EXIT
+
+times=0
+# Roughly a day
+limit=288
+
+while [ "$times" -lt "$limit" ]; do
+  curl -s -o /dev/null -f "${url}"
+  code=$?
+  if [ "$code" -ne 22 ]; then
+    exit 0;
+  fi
+  sleep 300
+  times=$((times+1))
+done
+echo "$url is still not up."
+exit 1;

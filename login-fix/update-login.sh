@@ -23,7 +23,7 @@ if [ -z "${host}" ] || [ -z "${token}" ] || [ -z "${login_url}" ]; then
 fi
 
 # Check that the host is up
-../check-up/check-up "https://${host}/health_check" || (echo "Not running, host isn't up"; exit 1)
+../check-up/check-up "https://${host}/help_links" || (echo "Not running, host isn't up"; exit 1)
 
 curl -X PUT -f \
   -o /dev/null -s \

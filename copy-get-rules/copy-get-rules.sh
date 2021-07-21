@@ -75,7 +75,7 @@ fi
 # Import the rules onto Canvas Test and Beta
 if [ "$exportCompleted" = true ] ; then
 
-	echo "Export complete within 5 minutes so processing file...\n"
+    echo "Export complete within 5 minutes so processing file...\n"
 
 	# Get the rules export zip
     file_processed=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token | jq -r '.details.file_processed' );
@@ -165,10 +165,10 @@ if [ "$exportCompleted" = true ] ; then
 	statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id_beta;
 
 	# Test for job id
-        if [ -z "import_job_id" ]  ; then
+    if [ -z "import_job_id" ]  ; then
         echo "Job id empty so exiting....";
-       exit 1;
-     fi
+        exit 1;
+    fi
 
 	# Check if import to beta has finished
 	echo "import job id beta: " $import_job_id_beta;

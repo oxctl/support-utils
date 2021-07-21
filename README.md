@@ -7,3 +7,4 @@ Supporting scripts for Canvas deployments
 * [requeue](requeue) Small script to run the passed command and if the command fails schedule it to be re-run with at(1).
 * [tabs-enabled](tabs-enabled) Small script to check which courses have the Chat tab enabled.
 * [course-index](course-index) Script to check which courses have course index enabled and also to optionally enable it.
+* [copy-get-rules](copy-get-rules) Script to copy the Group Enrolment Tool rules from Canvas production to Canvas Test and Canvas Beta.

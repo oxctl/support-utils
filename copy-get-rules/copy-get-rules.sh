@@ -1,23 +1,16 @@
 #!/bin/bash
 #
 # Copies get rules from prod to test and beta
-# Needs cut, ccurl, iconv and jq installed.
+# Needs cut, ccurl, iconv installed.
 
 if [ "$1" == "" ]; then
-  echo Usage: $(basename $0) config-file.env
+  echo Usage: $(basename $0) live_token beta_token test_token;
   exit 1;
 fi
 
-file="$1"
-
-# Check the config is ok.
-if [ ! -f "$file" ]; then
-  echo Cannot find config file: $file
-  exit 1
-fi
-
-# Actually load config
-source "${file}"
+live_token="$1";
+beta_token="$2";
+test_token="$3";
 
 if [ -z "${live_token}" ] || [ -z "${beta_token}" ] || [ -z "${test_token}" ]; then
   echo "You must set live_token, beta_token and test_token for this to work."
@@ -27,11 +20,13 @@ fi
 # Send start email
 echo "Subject: ***Copy GET rules process***: Starting process to copy GET rules from production to test and beta" | sendmail nick.wilson@it.ox.ac.uk;
 
-echo $live_token;
+echo "Live token is" $live_token;
+echo "beta token is"  $beta_token;
+echo "Test token is" $test_token;
 
 # Export GET rules from production
 echo "Exporting the GET rules from production\n";
-job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-prod.insproserv.net/export/rules' --header 'Authorization: '$live_token  | jq -r '.job_id' )
+job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-prod.insproserv.net/export/rules' --header 'Authorization: '$live_token  | grep -Po 'job_id":\K[0-9]+' )
 statusUrl=https://canvas-group-enrollment-dub-prod.insproserv.net/status/$job_id;
 echo "Job id is" $job_id;
 
@@ -49,10 +44,11 @@ runtime="5 minute"
 endtime=$(date -ud "$runtime" +%s)
 while [[ $(date -u +%s) -le $endtime ]]
 do
+	echo "Job id is" $job_id;
 	echo "Time Now: `date +%H:%M:%S`"
     	echo "Sleeping for 30 seconds\n"
     	sleep 30
-    	status=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token | jq -r '.status' )
+    	status=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token  | sed -n 's|.*"status":"\([^"]*\)".*|\1|p' )
 	if [ $status == "completed" ]; 	then
 		echo "Success! Export completed";
 		exportCompleted=true;
@@ -78,7 +74,7 @@ if [ "$exportCompleted" = true ] ; then
     echo "Export complete within 5 minutes so processing file...\n"
 
 	# Get the rules export zip
-    file_processed=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token | jq -r '.details.file_processed' );
+    file_processed=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token | sed -n 's|.*"file_processed":"\([^"]*\)".*|\1|p' );
 	mkdir ./$folderToSave;
 	wget $file_processed -O ./$folderToSave/$zipSaved;
     cd ./$folderToSave;
@@ -114,7 +110,7 @@ if [ "$exportCompleted" = true ] ; then
 	# Importing rules to test...
 	echo "Importing rules to test...";
 	import_job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' \
-	--header 'Authorization: '$test_token --form 'file=@'$zipToImport | jq -r '.job_id' );
+	--header 'Authorization: '$test_token --form 'file=@'$zipToImport | grep -Po 'job_id":\K[0-9]+' );
 	statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id;
 
 	# Test for job id
@@ -129,10 +125,11 @@ if [ "$exportCompleted" = true ] ; then
 	endtime=$(date -ud "$runtime" +%s)
 	while [[ $(date -u +%s) -le $endtime ]]
 	do
+		echo "Job id is" $import_job_id;
 		echo "Time Now: `date +%H:%M:%S`"
     		echo "Sleeping for 30 seconds"
     		sleep 30
-    		importStatus=$(curl --location --request GET $statusImportUrl --header 'Authorization: '$test_token | jq -r '.status' )
+    		importStatus=$(curl --location --request GET $statusImportUrl --header 'Authorization: '$test_token | sed -n 's|.*"status":"\([^"]*\)".*|\1|p' )
 		if [ $importStatus == "completed" ]; 	then
 			echo "Success! Import to test completed";
 			importCompleted=true;
@@ -161,7 +158,7 @@ if [ "$exportCompleted" = true ] ; then
 
 	# Importing rules to beta...
 	echo "Importing rules to beta...";
-	import_job_id_beta=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' --header 'Authorization: '$beta_token --form 'file=@'$zipToImport | jq -r '.job_id' );
+	import_job_id_beta=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' --header 'Authorization: '$beta_token --form 'file=@'$zipToImport | grep -Po 'job_id":\K[0-9]+' );
 	statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id_beta;
 
 	# Test for job id
@@ -176,10 +173,11 @@ if [ "$exportCompleted" = true ] ; then
 	endtime=$(date -ud "$runtime" +%s)
 	while [[ $(date -u +%s) -le $endtime ]]
 	do
+		echo "Job id is" $import_job_id_beta;
 		echo "Time Now: `date +%H:%M:%S`"
     		echo "Sleeping for 30 seconds"
     		sleep 30
-    		importStatus=$(curl --location --request GET $statusImportUrl --header 'Authorization: '$beta_token | jq -r '.status' )
+    		importStatus=$(curl --location --request GET $statusImportUrl --header 'Authorization: '$beta_token | sed -n 's|.*"status":"\([^"]*\)".*|\1|p')
 		if [ $importStatus == "completed" ]; 	then
 			echo "Success! Import to beta completed";
 			importCompleted=true;

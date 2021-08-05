@@ -18,13 +18,8 @@ if [ -z "${live_token}" ] || [ -z "${beta_token}" ] || [ -z "${test_token}" ] ||
   exit 1
 fi
 
-if [ "$env" = 'prod' ]  ; then
-		# Send start email
-        echo "Subject: ***Copy GET rules process*** ($env version): Starting process to copy GET rules from production to test and beta" | sendmail nick.wilson@it.ox.ac.uk;
-else
-        echo "Subject: ***Copy GET rules process*** ($env version): Starting process to copy GET rules from production to $env" | sendmail nick.wilson@it.ox.ac.uk;
-fi
-
+# Send start email
+echo "Subject: ***Copy GET rules process*** ($env version): Starting process to copy GET rules from production to test and beta" | sendmail nick.wilson@it.ox.ac.uk;
 
 echo "Live token is" $live_token;
 echo "beta token is"  $beta_token;
@@ -32,7 +27,7 @@ echo "Test token is" $test_token;
 
 # Export GET rules from production
 echo "Exporting the GET rules from production\n";
-job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-prod.insproserv.net/export/rules' --header 'Authorization: '$live_token  | jq -r '.job_id' )
+job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-prod.insproserv.net/export/rules' --header 'Authorization: '$live_token  | grep -Po 'job_id":\K[0-9]+' )
 statusUrl=https://canvas-group-enrollment-dub-prod.insproserv.net/status/$job_id;
 
 # Test for job id
@@ -53,7 +48,7 @@ do
 	echo "Time Now: `date +%H:%M:%S`"
     	echo "Sleeping for 30 seconds\n"
     	sleep 30
-    	status=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token  | jq -r '.status' )
+    	status=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token  | sed -n 's|.*"status":"\([^"]*\)".*|\1|p' )
 	if [ $status == "completed" ]; 	then
 		echo "Success! Export completed";
 		exportCompleted=true;
@@ -77,11 +72,9 @@ fi
 if [ "$exportCompleted" = true ] ; then
 
     echo "Export complete within 5 minutes so processing file...\n"
-    echo "Subject: ***Copy GET rules process*** ($env version): Export complete within 5 minutes so processing zip file..." | sendmail nick.wilson@it.ox.ac.uk;
-
 
 	# Get the rules export zip
-    file_processed=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token | jq -r '.details.file_processed' );
+    file_processed=$(curl --location --request GET $statusUrl --header 'Authorization: '$live_token | sed -n 's|.*"file_processed":"\([^"]*\)".*|\1|p' );
 	mkdir ./$folderToSave;
 	wget $file_processed -O ./$folderToSave/$zipSaved;
     cd ./$folderToSave;
@@ -125,10 +118,9 @@ if [ "$exportCompleted" = true ] ; then
 
 	# Importing rules to test...
 	if [ "$env" = 'test' ] || [ "$env" = 'prod' ]  ; then
-        echo "Importing rules to test...";
-        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to test..." | sendmail nick.wilson@it.ox.ac.uk;
+        	echo "Importing rules to test...";
 		import_job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' \
-		--header 'Authorization: '$test_token --form 'file=@'$zipToImport | jq -r '.job_id' );
+		--header 'Authorization: '$test_token --form 'file=@'$zipToImport | grep -Po 'job_id":\K[0-9]+' );
 		statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id;
 
 		# Test for job id
@@ -147,16 +139,15 @@ if [ "$exportCompleted" = true ] ; then
 			echo "Time Now: `date +%H:%M:%S`"
 	    		echo "Sleeping for 30 seconds"
 	    		sleep 30
-	    		importStatus=$(curl --location --request GET $statusImportUrl --header 'Authorization: '$test_token | jq -r '.status' )
+	    		importStatus=$(curl --location --request GET $statusImportUrl --header 'Authorization: '$test_token | sed -n 's|.*"status":"\([^"]*\)".*|\1|p' )
 			if [ $importStatus == "completed" ]; 	then
 				echo "Success! Import to test completed";
 				importCompleted=true;
 				break;
-	    	fi
+	    		fi
 
 			if [ $importStatus == "failed" ]; 	then
 				echo "Failure! Import to test not fully completed";
-		        echo "Subject: ***Copy GET rules process*** ($env version): Failure! Import to test not fully completed" | sendmail nick.wilson@it.ox.ac.uk;
 				break;
 	    		fi
 	   		echo "Import to test not processed yet - trying again in 30 seconds..."
@@ -183,10 +174,10 @@ if [ "$exportCompleted" = true ] ; then
 	if [ "$env" = 'beta' ] || [ "$env" = 'prod' ]  ; then
 
 
+
 		# Importing rules to beta...
 		echo "Importing rules to beta...";
-        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to beta..." | sendmail nick.wilson@it.ox.ac.uk;
-		import_job_id_beta=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' --header 'Authorization: '$beta_token --form 'file=@'$zipToImport | jq -r '.job_id' );
+		import_job_id_beta=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' --header 'Authorization: '$beta_token --form 'file=@'$zipToImport | grep -Po 'job_id":\K[0-9]+' );
 		statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id_beta;
 
 		# Test for job id
@@ -205,7 +196,7 @@ if [ "$exportCompleted" = true ] ; then
 			echo "Time Now: `date +%H:%M:%S`"
 	    		echo "Sleeping for 30 seconds"
 	    		sleep 30
-	    		importStatus=$(curl --location --request GET $statusImportUrl --header 'Authorization: '$beta_token | jq -r '.status' )
+	    		importStatus=$(curl --location --request GET $statusImportUrl --header 'Authorization: '$beta_token | sed -n 's|.*"status":"\([^"]*\)".*|\1|p')
 			if [ $importStatus == "completed" ]; 	then
 				echo "Success! Import to beta completed";
 				importCompleted=true;
@@ -235,11 +226,5 @@ if [ "$exportCompleted" = true ] ; then
 fi
 
 echo "Finished imports successfully";
-
-
-if [ "$env" = 'prod' ]  ; then
-		# Send start email
-        echo "Subject: ***Copy GET rules process*** ($env version): Finished process to copy GET rules from production to test and beta" | sendmail nick.wilson@it.ox.ac.uk;
-else
-        echo "Subject: ***Copy GET rules process*** ($env version): Finished process to copy GET rules from production to $env" | sendmail nick.wilson@it.ox.ac.uk;
-fi
+# Sending starting email
+echo "Subject: ***Copy GET rules process*** ($env version): Finished process successfully to copy GET rules from production to test and beta" | sendmail nick.wilson@it.ox.ac.uk;

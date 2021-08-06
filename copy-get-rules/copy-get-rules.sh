@@ -20,9 +20,9 @@ fi
 
 if [ "$env" = 'prod' ]  ; then
 		# Send start email
-        echo "Subject: ***Copy GET rules process*** ($env version): Starting process to copy GET rules from production to test and beta" | sendmail nick.wilson@it.ox.ac.uk;
+        echo "Subject: ***Copy GET rules process*** ($env version): Starting process to copy GET rules from production to test and beta" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 else
-        echo "Subject: ***Copy GET rules process*** ($env version): Starting process to copy GET rules from production to $env" | sendmail nick.wilson@it.ox.ac.uk;
+        echo "Subject: ***Copy GET rules process*** ($env version): Starting process to copy GET rules from production to $env" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 fi
 
 
@@ -77,7 +77,7 @@ fi
 if [ "$exportCompleted" = true ] ; then
 
     echo "Export complete within 5 minutes so processing file...\n"
-    echo "Subject: ***Copy GET rules process*** ($env version): Export complete within 5 minutes so processing zip file..." | sendmail nick.wilson@it.ox.ac.uk;
+    echo "Subject: ***Copy GET rules process*** ($env version): Export complete within 5 minutes so processing zip file..." | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 
 
 	# Get the rules export zip
@@ -97,7 +97,7 @@ if [ "$exportCompleted" = true ] ; then
 
 	# If test or beta, cut down files if test or beta
 	if [ "$env" = 'test' ] || [ "$env" = 'beta' ]  ; then
-		echo "Subject: ***Copy GET rules process*** ($env version): Cutting files down" | sendmail nick.wilson@it.ox.ac.uk;
+		echo "Subject: ***Copy GET rules process*** ($env version): Cutting files down" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 
 		# This section is for testing changes
 		head -n 2 "rules1.csv" >"rules_test.csv";
@@ -126,7 +126,7 @@ if [ "$exportCompleted" = true ] ; then
 	# Importing rules to test...
 	if [ "$env" = 'test' ] || [ "$env" = 'prod' ]  ; then
         echo "Importing rules to test...";
-        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to test..." | sendmail nick.wilson@it.ox.ac.uk;
+        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to test..." | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 		import_job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' \
 		--header 'Authorization: '$test_token --form 'file=@'$zipToImport | jq -r '.job_id' );
 		statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id;
@@ -156,7 +156,7 @@ if [ "$exportCompleted" = true ] ; then
 
 			if [ $importStatus == "failed" ]; 	then
 				echo "Failure! Import to test not fully completed";
-		        echo "Subject: ***Copy GET rules process*** ($env version): Failure! Import to test not fully completed" | sendmail nick.wilson@it.ox.ac.uk;
+		        echo "Subject: ***Copy GET rules process*** ($env version): Failure! Import to test not fully completed" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 				break;
 	    		fi
 	   		echo "Import to test not processed yet - trying again in 30 seconds..."
@@ -165,14 +165,14 @@ if [ "$exportCompleted" = true ] ; then
 		# Exit if import to test not complete within 60 mins
 		if [ "$importCompleted" != true ] ; then
 			echo "Import to test not complete within 60 minutes so exiting with failure...";
-			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Test" | sendmail nick.wilson@it.ox.ac.uk;
+			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Test" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 			exit 1;
 		fi
 
 		# Send success email
 		if [ "$importCompleted" = true ] ; then
 			echo "Import to test complete within 60 minutes";
-			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Test" | sendmail nick.wilson@it.ox.ac.uk;
+			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Test" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 		fi
     	fi
 
@@ -185,7 +185,7 @@ if [ "$exportCompleted" = true ] ; then
 
 		# Importing rules to beta...
 		echo "Importing rules to beta...";
-        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to beta..." | sendmail nick.wilson@it.ox.ac.uk;
+        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to beta..." | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 		import_job_id_beta=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' --header 'Authorization: '$beta_token --form 'file=@'$zipToImport | jq -r '.job_id' );
 		statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id_beta;
 
@@ -222,14 +222,14 @@ if [ "$exportCompleted" = true ] ; then
 		# Exit if import not complete
 		if [ "$importCompleted" != true ] ; then
 			echo "Import to beta not complete within 60 minutes so exiting with failure...";
-			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Beta" | sendmail nick.wilson@it.ox.ac.uk;
+			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Beta" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 			exit 1;
 		fi
 
 		# Send success email
 		if [ "$importCompleted" = true ] ; then
 			echo "Import to beta complete within 60 minutes";
-			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Beta" | sendmail nick.wilson@it.ox.ac.uk;
+			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Beta" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 		fi
 	fi
 fi
@@ -239,7 +239,7 @@ echo "Finished imports successfully";
 
 if [ "$env" = 'prod' ]  ; then
 		# Send start email
-        echo "Subject: ***Copy GET rules process*** ($env version): Finished process to copy GET rules from production to test and beta" | sendmail nick.wilson@it.ox.ac.uk;
+        echo "Subject: ***Copy GET rules process*** ($env version): Finished process to copy GET rules from production to test and beta" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 else
-        echo "Subject: ***Copy GET rules process*** ($env version): Finished process to copy GET rules from production to $env" | sendmail nick.wilson@it.ox.ac.uk;
+        echo "Subject: ***Copy GET rules process*** ($env version): Finished process to copy GET rules from production to $env" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 fi

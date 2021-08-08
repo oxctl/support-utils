@@ -139,7 +139,7 @@ if [ "$exportCompleted" = true ] ; then
 
 		# Check if import has finished
 		echo "import job id: " $import_job_id;
-		runtime="60 minute"
+		runtime="120 minute"
 		endtime=$(date -ud "$runtime" +%s)
 		while [[ $(date -u +%s) -le $endtime ]]
 		do
@@ -156,7 +156,7 @@ if [ "$exportCompleted" = true ] ; then
 
 			if [ $importStatus == "failed" ]; 	then
 				echo "Failure! Import to test not fully completed";
-		        echo "Subject: ***Copy GET rules process*** ($env version): Failure! Import to test not fully completed" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+		        echo "Subject: ***Copy GET rules process*** ($env version): Failure! Import to test returned with 'failed' status" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 				break;
 	    		fi
 	   		echo "Import to test not processed yet - trying again in 30 seconds..."
@@ -165,14 +165,14 @@ if [ "$exportCompleted" = true ] ; then
 		# Exit if import to test not complete within 60 mins
 		if [ "$importCompleted" != true ] ; then
 			echo "Import to test not complete within 60 minutes so exiting with failure...";
-			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Test" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Test within 120 minutes" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 			exit 1;
 		fi
 
 		# Send success email
 		if [ "$importCompleted" = true ] ; then
 			echo "Import to test complete within 60 minutes";
-			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Test" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Test successfully" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 		fi
     	fi
 
@@ -197,7 +197,7 @@ if [ "$exportCompleted" = true ] ; then
 
 		# Check if import to beta has finished
 		echo "import job id beta: " $import_job_id_beta;
-		runtime="60 minute"
+		runtime="120 minute"
 		endtime=$(date -ud "$runtime" +%s)
 		while [[ $(date -u +%s) -le $endtime ]]
 		do
@@ -213,7 +213,7 @@ if [ "$exportCompleted" = true ] ; then
 	    		fi
 
 			if [ $importStatus == "failed" ]; 	then
-				echo "Failure! Import to beta not fully completed";
+				echo "Failure! Importing rules to Canvas Beta returned with 'failed' status";
 				break;
 	    		fi
 	   		echo "Import to beta not processed yet - trying again in 30 seconds..."
@@ -222,14 +222,14 @@ if [ "$exportCompleted" = true ] ; then
 		# Exit if import not complete
 		if [ "$importCompleted" != true ] ; then
 			echo "Import to beta not complete within 60 minutes so exiting with failure...";
-			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Beta" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Beta within 120 minutes " | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 			exit 1;
 		fi
 
 		# Send success email
 		if [ "$importCompleted" = true ] ; then
 			echo "Import to beta complete within 60 minutes";
-			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Beta" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Beta successfully" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 		fi
 	fi
 fi

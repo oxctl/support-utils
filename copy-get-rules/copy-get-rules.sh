@@ -139,7 +139,7 @@ if [ "$exportCompleted" = true ] ; then
 
 		# Check if import has finished
 		echo "import job id: " $import_job_id;
-		runtime="120 minute"
+		runtime="1080 minute"
 		endtime=$(date -ud "$runtime" +%s)
 		while [[ $(date -u +%s) -le $endtime ]]
 		do
@@ -162,16 +162,16 @@ if [ "$exportCompleted" = true ] ; then
 	   		echo "Import to test not processed yet - trying again in 30 seconds..."
 		done
 
-		# Exit if import to test not complete within 60 mins
+		# Exit if import to test not complete within 9 hours mins
 		if [ "$importCompleted" != true ] ; then
-			echo "Import to test not complete within 60 minutes so exiting with failure...";
-			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Test within 120 minutes" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+			echo "Import to test not complete within 9 hours so exiting with failure...";
+			echo "Subject: ***Copy GET rules process*** ($env version): Failed to imported rules to Canvas Test within 9 hours" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 			exit 1;
 		fi
 
 		# Send success email
 		if [ "$importCompleted" = true ] ; then
-			echo "Import to test complete within 60 minutes";
+			echo "Import to test complete within 9 hours";
 			echo "Subject: ***Copy GET rules process*** ($env version): Imported rules to Canvas Test successfully" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 		fi
     	fi

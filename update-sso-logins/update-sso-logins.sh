@@ -46,7 +46,7 @@ if [ -z "$job_id" ]  ; then
     exit 1;
 fi
 
-# Check to see if the rules export has finished
+# Check to see if the users report has finished
 csvOriginalDownloaded=$( date '+%F_%H_%M_%S_original_report.csv' );
 csvCopy=$( date '+%F_%H_%M_%S_report_copy1.csv' );
 csvCopyOnlyOxIntIds=$( date '+%F_%H_%M_%S_report_copy_only_ox_intids.csv' );
@@ -145,6 +145,8 @@ if [ "$reportCompleted" = true ] ; then
 				echo "Success! SIS Import to $env completed";
 				echo "Subject: ***Update SSO Login Ids process*** ($host version):Success! SIS Import to $env completed" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 				importCompleted=true;
+				# Send file
+				uuencode $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 				break;
 	    	fi
 

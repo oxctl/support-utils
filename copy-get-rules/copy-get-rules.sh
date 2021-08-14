@@ -4,19 +4,30 @@
 # Needs cut, ccurl, iconv installed.
 
 if [ "$1" == "" ]; then
-  echo Usage: $(basename $0) live_token beta_token test_token enviroment;
+  echo Usage: $(basename $0) config-file.env
   exit 1;
 fi
 
-live_token="$1";
-beta_token="$2";
-test_token="$3";
-env="$4";
+file="$1"
+
+# Check the config is ok.
+if [ ! -f "$file" ]; then
+  echo Cannot find config file: $file
+  exit 1
+fi
+
+# Actually load config
+source "${file}"
 
 if [ -z "${live_token}" ] || [ -z "${beta_token}" ] || [ -z "${test_token}" ] || [ -z "${env}" ]; then
   echo "You must set live_token, beta_token and test_token and the environment for this to work."
   exit 1
 fi
+
+echo "Live token is" $live_token;
+echo "beta token is"  $beta_token;
+echo "Test token is" $test_token;
+echo "Env is" $env;
 
 if [ "$env" = 'prod' ]  ; then
 		# Send start email
@@ -26,14 +37,12 @@ else
 fi
 
 
-echo "Live token is" $live_token;
-echo "beta token is"  $beta_token;
-echo "Test token is" $test_token;
-
 # Export GET rules from production
-echo "Exporting the GET rules from production\n";
+echo "Exporting the GET rules from production";
 job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-prod.insproserv.net/export/rules' --header 'Authorization: '$live_token  | jq -r '.job_id' )
 statusUrl=https://canvas-group-enrollment-dub-prod.insproserv.net/status/$job_id;
+echo "Export Job id: "$job_id;
+echo "Subject: ***Copy GET rules process*** ($env version): Export Job id: "$job_id | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 
 # Test for job id
 if [ -z "$job_id" ]  ; then
@@ -125,17 +134,18 @@ if [ "$exportCompleted" = true ] ; then
 
 	# Importing rules to test...
 	if [ "$env" = 'test' ] || [ "$env" = 'prod' ]  ; then
-        echo "Importing rules to test...";
-        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to test..." | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+
 		import_job_id=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' \
 		--header 'Authorization: '$test_token --form 'file=@'$zipToImport | jq -r '.job_id' );
-		statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id;
+		echo "Importing rules to test...";
+        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to test. Job id: "$import_job_id | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+        statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id;
 
 		# Test for job id
-		    if [ -z "import_job_id" ]  ; then
+		if [ -z "import_job_id" ]  ; then
 			echo "Job id empty so exiting....";
 			exit 1;
-		    fi
+		fi
 
 		# Check if import has finished
 		echo "import job id: " $import_job_id;
@@ -184,10 +194,10 @@ if [ "$exportCompleted" = true ] ; then
 
 
 		# Importing rules to beta...
-		echo "Importing rules to beta...";
-        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to beta..." | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 		import_job_id_beta=$(curl --location --request POST 'https://canvas-group-enrollment-dub-test.insproserv.net/import/rules' --header 'Authorization: '$beta_token --form 'file=@'$zipToImport | jq -r '.job_id' );
 		statusImportUrl=https://canvas-group-enrollment-dub-test.insproserv.net/status/$import_job_id_beta;
+		echo "Importing rules to beta. Job id: "$import_job_id_beta;
+        echo "Subject: ***Copy GET rules process*** ($env version): Importing rules to beta. Job id: "$import_job_id_beta | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 
 		# Test for job id
 	    if [ -z "import_job_id" ]  ; then

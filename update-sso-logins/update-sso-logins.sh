@@ -117,7 +117,7 @@ if [ "$reportCompleted" = true ] ; then
     	# Importing formatted users to env...
         echo "SIS Importing users with correct logins to $host...";
         echo "Subject: ***Update SSO Login Ids process*** ($host version): SIS Importing users with correct logins to $host..." | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
-		import_job_id=$(curl -F 'attachment=@'$csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate -H 'Authorization: Bearer '$token $host'/api/v1/accounts/1/sis_imports.json?import_type=instructure_csv' | jq -r '.id');
+		import_job_id=$(curl -F 'attachment=@'$csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate -H 'Authorization: Bearer '$token $host'/api/v1/accounts/1/sis_imports.json?import_type=instructure_csv&override_sis_stickiness=true' | jq -r '.id');
 
 
 		echo "Sis import done .Id is" $import_job_id;

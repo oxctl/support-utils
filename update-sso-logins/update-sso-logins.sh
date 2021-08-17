@@ -146,8 +146,8 @@ if [ "$reportCompleted" = true ] ; then
 				echo "Subject: ***Update SSO Login Ids process*** ($host version):Success! SIS Import to $env completed" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 				importCompleted=true;
 				# Send file
-				filename="sis_import_from_$host.csv";
-				uuencode $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate $filename | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+				filename=$( date '+%F_%H_%M_%S_sis_import_from_'$host'.csv' );
+				uuencode $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate $filename | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk,kathryn.purcell@tss.ox.ac.uk;
 				break;
 	    	fi
 

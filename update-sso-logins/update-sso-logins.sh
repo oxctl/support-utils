@@ -147,7 +147,32 @@ if [ "$reportCompleted" = true ] ; then
 				importCompleted=true;
 				# Send file
 				filename=$( date '+%F_%H_%M_%S_sis_import_from_'$host'.csv' );
-				uuencode $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate $filename | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk,kathryn.purcell@tss.ox.ac.uk;
+
+				 # Save user_ids
+                users=$(cat $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate | awk -F "," '{ print $2 }');
+                echo "users:" $users;
+
+				# Create OSM ticket if on production environment and more than 0 users
+                if [[ $(wc -l <$csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate) -ge 2 ]]; then
+                       echo "There's at least one user so seeing if we're on prod or not";
+                       echo "Subject: ***Update SSO Login Ids process*** ($host version): There's at least one user so seeing if we're on prod or not" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+
+                       if [ "$host" = 'https://canvas.ox.ac.uk' ]  ; then
+                            echo "On Prod so creating an OSM ticket ";
+                            echo "Subject: ***Update SSO Login Ids process*** ($host version): On Prod so creating an OSM ticket" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+
+                            ## Create OSM ticket
+                            (echo -e "From: no-reply@dataprovisioning.canvas.ox.ac.uk\nTo: canvas@it.ox.ac.uk\nSubject: SSO users cannot login to Canvas\n\nThe following SSO users cannot login to Canvas because they have external logins and should instead have SSO logins.\n\nPlease manually change their login ids." ;  uuencode $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate $filename) | /usr/sbin/sendmail -t;
+                            echo "Subject: ***Update SSO Login Ids process*** ($host version): Created OSM ticket" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+                        else
+                            echo "Test or beta version so not creating OSM ticket, just sending email to nick.wilson@it.ox.ac.uk";
+                            echo "Subject: ***Update SSO Login Ids process*** ($host version): On $host version so not creating OSM ticket, just sending email to nick.wilson@it.ox.ac.uk" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+                            echo "Subject: ***Update SSO Login Ids process*** ($host version): Users are: $users" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+                        fi
+                else
+                        echo "There's no users so not creating OSM ticket, just sending an email to Nick";
+                        echo "Subject: ***Update SSO Login Ids process*** ($host version): There's no users so not creating OSM ticket" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
+                 fi
 				break;
 	    	fi
 

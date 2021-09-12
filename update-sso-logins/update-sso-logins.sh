@@ -162,7 +162,7 @@ if [ "$reportCompleted" = true ] ; then
                             echo "Subject: ***Update SSO Login Ids process*** ($host version): On Prod so creating an OSM ticket" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
 
                             ## Create OSM ticket
-                            (echo -e "From: no-reply@dataprovisioning.canvas.ox.ac.uk\nTo: canvas@it.ox.ac.uk\nSubject: SSO users cannot login to Canvas\n\nThe following SSO users cannot login to Canvas because they have external logins and should instead have SSO logins.\n\nPlease manually change their login ids." ;  uuencode $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate $filename) | /usr/sbin/sendmail -t;
+                            (echo -e "From: no-reply@dataprovisioning.canvas.ox.ac.uk\nTo: canvas@it.ox.ac.uk\nSubject: SSO users cannot login to Canvas\n\nThe following SSO users cannot login to Canvas because they have external logins and have been changed to instead have SSO logins.\n\n$users\n\n" ;  uuencode $csvCopyOnlyOxIntegrationIdAndNoOXACUKAndNoAmpersandInUseidsUpdate $filename) | /usr/sbin/sendmail -t;
                             echo "Subject: ***Update SSO Login Ids process*** ($host version): Created OSM ticket" | /usr/sbin/sendmail nick.wilson@it.ox.ac.uk;
                         else
                             echo "Test or beta version so not creating OSM ticket, just sending email to nick.wilson@it.ox.ac.uk";

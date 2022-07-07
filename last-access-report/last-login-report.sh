@@ -30,8 +30,18 @@ id=`curl -X POST  https://${host}/api/v1/accounts/1/reports/last_user_access_csv
 # wait 
 sleep 300
 
+loop_counter=0
 while [ true ]
 do 
+
+	if [ ${loop_counter} -gt 20 ]
+	then
+		echo "Too many failed attempts (${loop_counter}) to retrieve the report, quitting"
+		exit 1
+	fi
+
+	# increment counter
+	loop_counter=$((loop_counter+1))
 
 	# fetch response, check if report complete
 	check_report_json=`curl -X GET https://${host}/api/v1/accounts/1/reports/last_user_access_csv/${id}  -H "Authorization: Bearer ${token}" `

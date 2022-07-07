@@ -50,7 +50,7 @@ do
 			# echo "Report is complete"
 	
 			# grab the report's URL & remove quotes
-			url=`echo ${check_report_json} | jq '.attachment.url' | sed -e 's/"//g'`
+			url=`echo ${check_report_json} | jq -r '.attachment.url'`
 
 			echo "URL of report is ${url} Fetching ............}"
 

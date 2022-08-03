@@ -62,10 +62,10 @@ do
 			# grab the report's URL & remove quotes
 			url=`echo ${check_report_json} | jq -r '.attachment.url'`
 
-			echo "URL of report is ${url} Fetching ............}"
+			#DEBUG echo "URL of report is ${url} Fetching ............}"
 
-			# grab the report
-			curl  -L -X GET ${url} -H "Authorization: Bearer ${token}" 
+			# grab the report, put last accessed column first, delete all lines where no login, sort on first column and write out first 100 lines
+			curl  -L -X GET ${url} -H "Authorization: Bearer ${token}" | csvcut -c 4,1,2,3,5 | sed -e '/^,/d'| csvsort -r -c 1 | head -100
 			exit 0
 		else
 			sleep 300
@@ -73,8 +73,3 @@ do
 	fi
 done
 
-
-
-
-
-echo "out of loop"

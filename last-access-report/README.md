@@ -11,7 +11,10 @@ To run this:
 * curl
 * bash
 * jq
-
+* sed
+* head
+* csvsort - part of csvkit
+* csvcut - part of csvkit
 
 ## Usage
 

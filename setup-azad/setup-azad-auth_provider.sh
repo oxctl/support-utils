@@ -44,3 +44,7 @@ id=`echo "${auth_object}" | jq '.id'`
 # TO DO
 # if the above is successful, we should now change the login route to be https://${host}/login/saml/<<id-from-above-curl-response>>
 printf "TO DO Set login URL to be https://${host}/login/saml/${id}\n\n"
+
+curl -XPUT "https://${host}/api/v1/accounts/1/sso_settings' \
+     -F "sso_settings[auth_discovery_url]=https://${host}/login/saml/${id}" \
+     -s -H "Authorization: Bearer ${token}"

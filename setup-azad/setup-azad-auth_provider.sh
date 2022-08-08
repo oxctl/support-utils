@@ -34,17 +34,18 @@ auth_object=`curl "https://${host}/api/v1/accounts/1/authentication_providers"  
   -F "log_out_url=${log_out_url}"\
   -F "idp_entity_id=${idp_entity_id}"\
   -F "log_in_url=${log_in_url}"\
-  -F "certificate_fingerprint=${certificate_fingerprint}" | jq`
+  -F "certificate_fingerprint=${certificate_fingerprint}" | jq` || (printf "Unable to add AzAD auth method\n\n"; exit 1)
 
 printf "Auth object"
 printf "${auth_object}" | jq
 
 id=`echo "${auth_object}" | jq '.id'`
 
-# TO DO
 # if the above is successful, we should now change the login route to be https://${host}/login/saml/<<id-from-above-curl-response>>
-printf "TO DO Set login URL to be https://${host}/login/saml/${id}\n\n"
+printf "Setting 'discovery URL' to be https://${host}/login/saml/${id}\n\n"
 
-curl -XPUT "https://${host}/api/v1/accounts/1/sso_settings' \
+curl -XPUT "https://${host}/api/v1/accounts/1/sso_settings" \
      -F "sso_settings[auth_discovery_url]=https://${host}/login/saml/${id}" \
-     -s -H "Authorization: Bearer ${token}"
+     -s -H "Authorization: Bearer ${token}" | jq || (printf "Unable to set Discovery URL\n\n"; exit 1)
+
+printf "\n\n"

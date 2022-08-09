@@ -27,6 +27,7 @@ fi
 # Check that the host is up
 ../check-up/check-up "https://${host}/help_links" || (echo "Not running, host isn't up"; exit 1)
 
+set -e
 
 # Delete prod provider (id is in env file)
 printf "Attempting to delete auth provider with id = ${prod_id}\n"

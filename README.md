@@ -8,4 +8,4 @@ Supporting scripts for Canvas deployments
 * [tabs-enabled](tabs-enabled) Small script to check which courses have the Chat tab enabled.
 * [course-index](course-index) Script to check which courses have course index enabled and also to optionally enable it.
 * [copy-get-rules](copy-get-rules) Script to copy the Group Enrolment Tool rules from Canvas production to Canvas Test and Canvas Beta.
-* [last-access-report](last-access-report) Script to download the last user access report
+* [last-user-access](last-user-access) Script to download the last user access report

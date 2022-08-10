@@ -18,10 +18,10 @@ To run this:
 
 ## Usage
 
-Copy `exmaple.env` to `beta.env` (or `test.env`) and edit to reflect your environment. Then
+Copy `example.env` to `beta.env` (or `test.env`) and edit to reflect your environment. Then
 schedule regular runs just before test / beta refresh using something like cron.
 
-    last-login-report.sh beta.ev
+    last-user-access.sh beta.env
 
 If everything goes ok the the output of the script is the report: a CSV file which 'cron' should email.
 If there's a problem this should generate a error and 'cron' should email the results.

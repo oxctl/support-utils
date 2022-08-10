@@ -25,7 +25,7 @@ fi
 # Check that the host is up
 ../check-up/check-up "https://${host}/help_links" || (echo "Not running, host isn't up"; exit 1)
 
-id=`curl -X POST  https://${host}/api/v1/accounts/1/reports/last_user_access_csv  -H "Authorization: Bearer ${token}" | jq '.id'`
+id=`curl -X POST  https://${host}/api/v1/accounts/1/reports/last_user_access_csv  -s -H "Authorization: Bearer ${token}" | jq '.id'`
 
 # wait 
 sleep 300
@@ -44,7 +44,7 @@ do
 	loop_counter=$((loop_counter+1))
 
 	# fetch response, check if report complete
-	check_report_json=`curl -X GET https://${host}/api/v1/accounts/1/reports/last_user_access_csv/${id}  -H "Authorization: Bearer ${token}" `
+	check_report_json=`curl -X GET https://${host}/api/v1/accounts/1/reports/last_user_access_csv/${id}  -s -H "Authorization: Bearer ${token}" `
 
 	# grab value of status in JSON
 	status=`echo ${check_report_json} | jq '.status'`
@@ -65,7 +65,7 @@ do
 			#DEBUG echo "URL of report is ${url} Fetching ............}"
 
 			# grab the report, put last accessed column first, delete all lines where no login, sort on first column and write out first 100 lines
-			curl  -L -X GET ${url} -H "Authorization: Bearer ${token}" | csvcut -c 4,1,2,3,5 | sed -e '/^,/d'| csvsort -r -c 1 | head -100
+			curl  -L -X GET ${url} -s -H "Authorization: Bearer ${token}" | csvcut -c 4,1,2,3,5 | sed -e '/^,/d'| csvsort -r -c 1 | head -100
 			exit 0
 		else
 			sleep 300

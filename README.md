@@ -9,3 +9,4 @@ Supporting scripts for Canvas deployments
 * [course-index](course-index) Script to check which courses have course index enabled and also to optionally enable it.
 * [copy-get-rules](copy-get-rules) Script to copy the Group Enrolment Tool rules from Canvas production to Canvas Test and Canvas Beta.
 * [last-access-report](last-access-report) Script to download the last user access report
+* [setup-azad-auth](setup-azad-auth) Setsup AzAD auth provider, sets discovery page to this new auth route & deletes the auth provider copied from prod each. But not in that order!

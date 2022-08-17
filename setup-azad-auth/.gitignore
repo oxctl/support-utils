@@ -3,3 +3,5 @@
 
 # Or, for that matter, swp files
 *.swp
+
+.DS_Store

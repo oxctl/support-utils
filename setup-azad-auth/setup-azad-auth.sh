@@ -2,6 +2,9 @@
 # This create an AzAD authentication provider in Canvas 
 # typically this is used for Canvas Beta which will have a URL of /login/saml/139 but could be used on any server 
 
+# Set flag to quit on error, eg host unavailable
+set -e
+
 if [ "$1" == "" ]; then
   echo Usage: $(basename $0) config-file.env
   exit 1;
@@ -26,8 +29,6 @@ fi
 
 # Check that the host is up
 ../check-up/check-up "https://${host}/help_links" || (echo "Not running, host isn't up"; exit 1)
-
-set -e
 
 # Delete prod provider (id is in env file)
 printf "Attempting to delete auth provider with id = ${prod_id}\n"

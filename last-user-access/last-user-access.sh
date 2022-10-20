@@ -1,6 +1,9 @@
 #!/bin/bash
 # This downloads the last user access report from Canvas
 
+# Set flag to quit on error, eg host unavailable
+set -e
+
 if [ "$1" == "" ]; then
   echo Usage: $(basename $0) config-file.env
   exit 1;

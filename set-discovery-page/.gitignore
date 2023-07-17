@@ -1,0 +1,7 @@
+# We don't want production variables appearing in the git repository
+*.env
+
+# Or, for that matter, swp files
+*.swp
+
+.DS_Store

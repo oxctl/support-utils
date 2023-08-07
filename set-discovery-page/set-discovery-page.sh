@@ -29,6 +29,19 @@ fi
 # Check that the host is up
 ../check-up/check-up "https://${host}/help_links" || (echo "Not running, host isn't up"; exit 1)
 
+# Delete prod provider (id is in env file)
+printf "Attempting to delete auth provider with id = ${prod_id}\n"
+
+# see: https://canvas.instructure.com/doc/api/authentication_providers.html#method.authentication_providers.destroy
+deleted_auth_provider=`curl -XDELETE "https://${host}/api/v1/accounts/1/authentication_providers/${prod_id}" \
+     -s -H "Authorization: Bearer ${token}" | jq` || printf "Unable to delete auth provider (${prod_id}) - requires manual attention\n\n"
+
+# if the JSON include the prod_id that we've just deleted then it worked, otherwise we failed
+printf "If the JSON below is an error message then we failed\n"
+echo ${deleted_auth_provider} | jq
+printf "\n"
+
+
 # we change the login route to be https://${host}/login/saml/${provider_id}
 printf "Setting 'discovery URL' to be https://${host}/login/saml/${provider_id}\n"
 

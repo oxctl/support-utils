@@ -20,8 +20,8 @@ fi
 # Actually load config
 source "${file}"
 
-if [ -z "${host}" ] || [ -z "${token}" ] || [ -z "${provider_id}" ] ; then 
-  echo "You must set host, token  and provider_id for this to work."
+if [ -z "${host}" ] || [ -z "${token}" ] || [ -z "${prod_id}" ] ; then 
+  echo "You must set host, token  and prod_id for this to work."
   exit 1
 fi
 

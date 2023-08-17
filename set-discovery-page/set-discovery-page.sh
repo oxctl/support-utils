@@ -42,10 +42,10 @@ echo ${deleted_auth_provider} | jq
 printf "\n"
 
 
-# we change the login route to be https://${host}/login/saml/${provider_id}
-printf "Setting 'discovery URL' to be https://${host}/login/saml/${provider_id}\n"
+# we change the login route to be https://${host}/login/saml/${beta_id}
+printf "Setting 'discovery URL' to be https://${host}/login/saml/${beta_id}\n"
 
 # See: https://canvas.instructure.com/doc/api/authentication_providers.html#method.authentication_providers.update_sso_settings
 curl -XPUT "https://${host}/api/v1/accounts/1/sso_settings" -s -H "Authorization: Bearer ${token}"  \
-     -F "sso_settings[auth_discovery_url]=https://${host}/login/saml/${provider_id}" | jq || (printf "Unable to set Discovery URL\n\n"; exit 1)
+     -F "sso_settings[auth_discovery_url]=https://${host}/login/saml/${beta_id}" | jq || (printf "Unable to set Discovery URL\n\n"; exit 1)
 printf "\n\n"

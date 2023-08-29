@@ -40,6 +40,6 @@ curl -X PUT 'https://universityofoxford.beta.instructure.com/api/v1/accounts/1/e
      -F 'account_navigation[label]=Oxford Groups Beta' \
      -F 'consumer_key=ox'  \
      -F 'name=Beta GET (Oxford Groups)' | jq
-     || (printf "Unable to set Discovery URL\n\n"; exit 1)
+     || (printf "Unable to set Oxford Groups to use the Beta version. Please do this manually.\n\n"; exit 1)
 
 printf "\n\n"

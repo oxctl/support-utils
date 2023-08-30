@@ -32,14 +32,14 @@ fi
 printf "Setting names and labels to be 'Oxford Groups Beta' and consumer key to be 'ox' for tool with ID ${get_tool_id}\n"
 
 # See: https://canvas.instructure.com/doc/api/external_tools.html
-curl -X PUT 'https://universityofoxford.beta.instructure.com/api/v1/accounts/1/external_tools/9604'   \
+curl -X PUT 'https://${host}/api/v1/accounts/1/external_tools/9604'   \
      -H "Authorization: Bearer ${token}"  \
      -F 'course_navigation[text]=Oxford Groups Beta' \
      -F 'course_navigation[label]=Oxford Groups Beta' \
      -F 'account_navigation[text]=Oxford Groups Beta' \
      -F 'account_navigation[label]=Oxford Groups Beta' \
      -F 'consumer_key=ox'  \
-     -F 'name=Beta GET (Oxford Groups)' | jq
+     -F 'name=Beta GET (Oxford Groups)' | jq \
      || (printf "Unable to set Oxford Groups to use the Beta version. Please do this manually.\n\n"; exit 1)
 
 printf "\n\n"

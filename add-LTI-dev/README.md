@@ -1,9 +1,10 @@
-# Adds all 'dev' versions of LTI 1.3 tools at the root sub-account on Canvas Beta (and Test) - DO NOT USE ON PRODUCTION
+# Adds all 'dev' versions of LTI 1.3 tools at the root sub-account on Canvas Beta (and Test) if they arent already deployed - DO NOT USE ON PRODUCTION
 
 This simple shell script will make Canvas use the DEV versions of all LTI 1.3 tools. It:
 
-* adds each tool (whose 'client_id' is given as an array element in the "env" file) at the root sub-account
-* assumes the dev version of the tool is already set up and already has a client_id
+* builds a list of already installed tools (keyed on 'developer_key_id')
+* ensures these one copy of each tool whose 'client_id' is given as an array element in the "env" file at the root sub-account
+* assumes the dev version of the tool has already been already set up but not deployed
 
 ## Requirements
 
@@ -11,6 +12,7 @@ To run this:
 
 * curl
 * bash
+* grep
 * jq
 
 

@@ -35,8 +35,9 @@ read -r -a client_ids_array <<< "${client_ids}"
 
 # Get a list of all external tools & extract the line showing the developer_key_ids, save in a tmp file
 
+dev_key_ids_file=$(mktemp) 
 curl -s -X GET https://${host}/api/v1/accounts/1/external_tools?per_page=1000  \
-    -H "Authorization: Bearer ${token}"  | jq | grep "developer_key_id" > /tmp/dev_key_ids.txt
+    -H "Authorization: Bearer ${token}"  | jq | grep "developer_key_id" >> $dev_key_ids_file
 
 # Add each tool where we have a client ID but only if it isnt already installed
 for client_id in "${client_ids_array[@]}"
@@ -49,7 +50,7 @@ do
   #printf "\nSetting up tool with client ID of ${client_id} and developer_key_id of ${developer_key_id}\n"
 
   # was the tool with the corresponding dev_key in the tools list
-  if grep -q -F "\"developer_key_id\": ${developer_key_id}," /tmp/dev_key_ids.txt; then 
+  if grep -q -F "\"developer_key_id\": ${developer_key_id}," $dev_key_ids_file; then 
 
     echo "Tool with client_id ${client_id} is already installed"; 
 
@@ -57,25 +58,26 @@ do
 
     echo "Tool with client_id ${client_id} will be installed"; 
 
+    client_id_json_file=$(mktemp ${client_id}-XXXX)
     curl -s -X POST https://${host}/api/v1/accounts/1/external_tools  \
       -H "Authorization: Bearer ${token}" \
-      -F "client_id=${client_id}" | jq > /tmp/${client_id}.json
+      -F "client_id=${client_id}" | jq > $client_id_json_file
 
     # was the tool set up or was there an error
-    if grep -q -F "\"developer_key_id\": ${developer_key_id}," /tmp/${client_id}.json; then 
-      cat /tmp/${client_id}.json | jq -r '.name' | tr '\n' ' '; 
+    if grep -q -F "\"developer_key_id\": ${developer_key_id}," $client_id_json_file; then 
+      cat $client_id_json_file | jq -r '.name' | tr '\n' ' '; 
       printf "successfully set up\n\n"; 
     else
        printf "** Unable to set tool with client ID ${client_id}. Please do this manually. **\n\n";
     fi
 
     # Tidy up
-    rm /tmp/${client_id}.json
+    rm $client_id_json_file
 
   fi  
 
 done
 
 # remove the temp file
-rm /tmp/dev_key_ids.txt
+rm $dev_key_ids_file
 

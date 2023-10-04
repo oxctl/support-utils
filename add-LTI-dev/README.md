@@ -11,6 +11,7 @@ This simple shell script will make Canvas use the DEV versions of all LTI 1.3 to
 To run this:
 
 * curl
+* mktemp
 * bash
 * grep
 * jq

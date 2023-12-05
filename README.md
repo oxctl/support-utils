@@ -1,4 +1,4 @@
-# canvas-support
+# support-utils
 Supporting scripts for Canvas deployments
 
 * [add-LTI-dev](add-LTI-dev) Script to add all LTI 1.3 tools in the root subaccount, NB, run once every 4 weeks on Test otherwise there will be multiple copies of each tool

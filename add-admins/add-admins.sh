@@ -43,11 +43,13 @@ do
     if [ $code -eq 22 ]; then
       cat notice.txt
       echo "Login failed for: ${host}\nCheck token is valid"
+      # since we cant login, we may as well quit
+      exit 1
     else
+      # log the error and carry on
       cat notice.txt
       echo "Failed to add: $admin for: $host"
     fi
-    exit 1
   fi
 done
 
